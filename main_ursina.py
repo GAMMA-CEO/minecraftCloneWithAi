@@ -1,7 +1,6 @@
 from ursina import Ursina, Button, Entity, color, scene, mouse, destroy, Sky, Text, held_keys, camera, application, invoke
 from ursina.prefabs.first_person_controller import FirstPersonController
 import time
-from ctypes import cdll, c_char_p
 import os
 from ursina.shaders import lit_with_shadows_shader
 from random import randint
@@ -143,26 +142,6 @@ instructions = Text(
     background=True
 )
 
-cpp_fun_message = ''
-def get_cpp_message(mode):
-    try:
-        lib_path = os.path.join(os.path.dirname(__file__), 'fun_message.dll')
-        fun_lib = cdll.LoadLibrary(lib_path)
-        fun_lib.get_fun_message.restype = c_char_p
-        fun_lib.get_fun_message.argtypes = [c_char_p]
-        return fun_lib.get_fun_message(mode.encode('utf-8')).decode('utf-8')
-    except Exception as e:
-        return f'C++ fun message not loaded. ({mode})'
-
-cpp_text = Text(
-    text=get_cpp_message(mode),
-    origin=(-.5, 0),
-    scale=1.2,
-    background=True,
-    position=(-.45, .38),
-    color=color.yellow
-)
-
 def input(key):
     global mode, fly_enabled, last_space_time
     if key == '1':
@@ -174,7 +153,6 @@ def input(key):
     elif key == 'c':
         mode = 'explore' if mode == 'build' else 'build'
         mode_text.text = f'Mode: {mode.title()}'
-        cpp_text.text = get_cpp_message(mode)
         if mode == 'explore':
             fly_enabled = False
     elif key == 'space':
